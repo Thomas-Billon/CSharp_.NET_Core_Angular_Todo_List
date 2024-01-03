@@ -1,0 +1,36 @@
+﻿<h1 id="tableLabel">Todo List</h1>
+
+<table *ngIf="tasks">
+    <thead>
+        <tr>
+            <th>IsCompleted</th>
+            <th>Id</th>
+            <th>Label</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let task of tasks">
+            <td><input type="checkbox" [checked]="task.isCompleted" (change)="updateTask({ id: task.id, label: task.label, isCompleted: !task.isCompleted });"/></td>
+            <td>{{ task.id }}</td>
+            <td>{{ task.label }}</td>
+            <td>
+                <button class="btn-primary" (click)="deleteTask(task.id);">Delete</button>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>NEW</td>
+            <td>
+                <input
+                #newTask
+                placeholder="Add a task"
+                (keyup.enter)="createTask({ id: 0, label: newTask.value, isCompleted: false }); newTask.value='';"
+                class="lg-text-input" />
+            </td>
+            <td>
+                <button class="btn-primary" (click)="createTask({ id: 0, label: newTask.value, isCompleted: false }); newTask.value='';">Create</button>
+            </td>
+        </tr>
+    </tbody>
+</table>

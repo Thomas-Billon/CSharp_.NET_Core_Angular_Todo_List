@@ -1,0 +1,6 @@
+@TodoList.Server_HostAddress = http://localhost:5032
+
+GET {{TodoList.Server_HostAddress}}/task/
+Accept: application/json
+
+###
