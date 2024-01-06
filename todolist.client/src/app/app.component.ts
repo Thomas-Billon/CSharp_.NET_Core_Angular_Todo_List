@@ -10,11 +10,17 @@ import { Task } from 'models/task';
 
 export class AppComponent implements OnInit {
     public tasks: Task[] = [];
+    public newTask!: Task;
 
     constructor(private http: HttpClient) {}
 
     ngOnInit() {
         this.getAllTasks();
+        this.resetNewTask();
+    }
+
+    resetNewTask() {
+        this.newTask = {id: 0, label: '', isCompleted: false};
     }
 
     getAllTasks() {
@@ -33,6 +39,7 @@ export class AppComponent implements OnInit {
             next: (result) => {
                 task.id = result;
                 this.tasks.push(task);
+                this.resetNewTask();
             },
             error: (e) => {
                 console.error(e);

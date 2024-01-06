@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Task } from 'models/task';
 
 @Component({
@@ -11,23 +11,43 @@ export class TaskComponent {
     public isLabelSelected: boolean = false;
 
     @Input() task!: Task;
+    @Input() isNew: boolean = false;
+    @Output() create = new EventEmitter<Task>();
     @Output() update = new EventEmitter<Task>();
     @Output() delete = new EventEmitter<Task>();
 
+    ngOnInit() {
+        this.isLabelSelected = this.isNew;
+    }
+
     editLabel(label: string) {
         this.task.label = label;
-        this.isLabelSelected = false;
 
-        this.update.emit();
+        if (this.isNew) {
+            this.create.emit();
+        }
+        else {
+            this.isLabelSelected = false;
+            this.update.emit();
+        }
     }
 
     editIsCompleted(isCompleted: boolean) {
         this.task.isCompleted = isCompleted;
 
-        this.update.emit();
+        if (this.isNew) {
+            this.create.emit();
+        }
+        else {
+            this.update.emit();
+        }
     }
 
     selectLabel(event: Event) {
+        if (this.isNew) {
+            return;
+        }
+
         this.isLabelSelected = true;
 
         // Set timeout to reflect correct data state and focus properly
@@ -37,6 +57,10 @@ export class TaskComponent {
     }
 
     unselectLabel(event: Event) {
+        if (this.isNew) {
+            return;
+        }
+
         // Exclude label to avoid unselecting immediately
         if ((event.target as HTMLElement).id != `label-${this.task.id}`)
         {

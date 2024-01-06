@@ -4,29 +4,18 @@
     <tbody>
         <tr app-task
             *ngFor="let task of tasks"
-            id="{{task.id}}"
-            class="py-1"
+            id="{{ task.id }}"
+            class="task"
             [task]="task"
             (update)="updateTask(task);"
             (delete)="deleteTask(task.id);">
         </tr>
-        <tr>
-            <td class="table-col-3 py-1"></td>
-            <td class="py-1 px-0">
-                <input
-                    #newTask
-                    class="task-input w-100 bg-transparent"
-                    placeholder="Add a task"
-                    (keyup.enter)="createTask({ id: 0, label: newTask.value, isCompleted: false }); newTask.value='';"
-                />
-            </td>
-            <td class="table-col-3 py-1">
-                <button
-                    class="btn btn-primary task-button"
-                    (click)="createTask({ id: 0, label: newTask.value, isCompleted: false }); newTask.value='';">
-                    <i class="fa fa-plus"></i>
-                </button>
-            </td>
+        <tr app-task
+            id="new"
+            class="task"
+            [task]="newTask"
+            [isNew]="true"
+            (create)="createTask(newTask);">
         </tr>
     </tbody>
 </table>

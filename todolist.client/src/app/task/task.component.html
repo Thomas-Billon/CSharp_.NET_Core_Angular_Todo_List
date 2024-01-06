@@ -1,33 +1,35 @@
 <td class="table-col-3 py-1">
     <input
-        class="task-checkbox"
         type="checkbox"
+        class="task-checkbox"
+        [ngClass]="{ 'disabled': isNew }"
         [checked]="task.isCompleted"
+        [attr.disabled]="isNew ? true : null"
         (change)="editIsCompleted(!task.isCompleted);"
     />
 </td>
-<td class="py-1">
+<td class="py-1 px-0">
     <div
-        id="{{'label-' + task.id}}"
-        class="h-auto text-left font-weight-bold"
+        id="{{ 'label-' + task.id }}"
+        class="task-label w-100 text-left font-weight-bold"
         [ngClass]="{ 'd-none': isLabelSelected, 'task-completed': task.isCompleted }"
         (click)="selectLabel($event)">
         {{ task.label }}
     </div>
     <input
         #newTaskLabel
-        id="{{'input-' + task.id}}"
+        id="{{ 'input-' + task.id }}"
         class="task-input w-100 bg-transparent"
-        placeholder="Edit task"
+        placeholder="{{ isNew ? 'Add new task' : 'Edit task' }}"
         [value]="task.label"
-        [ngClass]="{'d-none': !isLabelSelected}"
+        [ngClass]="{ 'd-none': !isLabelSelected }"
         (clickOutside)="unselectLabel($event);"
         (keyup.enter)="editLabel(newTaskLabel.value);"
     />
 </td>
 <td class="table-col-3 py-1">
     <button
-        class="btn btn-primary task-button"
+        class="btn btn-primary task-button task-button-hover"
         [ngClass]="{'d-none': isLabelSelected}"
         (click)="delete.emit();">
         <i class="fa fa-trash"></i>
@@ -35,8 +37,11 @@
     <button
         *ngIf="isLabelSelected"
         class="btn btn-primary task-button"
-        [ngClass]="{'d-none': !isLabelSelected}"
+        [ngClass]="{ 'd-none': !isLabelSelected }"
         (click)="editLabel(newTaskLabel.value);">
-        <i class="fa fa-pencil"></i>
+        <i
+            class="fa"
+            [ngClass]="isNew ? 'fa-plus' : 'fa-pencil'">
+        </i>
     </button>
 </td>

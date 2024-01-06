@@ -3,7 +3,7 @@
 @import "../node_modules/font-awesome/scss/font-awesome.scss";
 
 input[type=checkbox] {
-    vertical-align: bottom;
+    vertical-align: middle;
 }
 
 .btn:focus, .btn:not(:disabled):not(.disabled):active:focus {
@@ -14,30 +14,51 @@ input[type=checkbox] {
     width: 3rem;
 }
 
-.task-checkbox {
-    width: 1.5rem;
-    height: 1.5rem;
+.task {
+    .task-checkbox {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    .task-label {
+        display: inline-block;
+        height: 1.75rem;
+        line-height: 1.75rem;
+    }
+    
+    .task-input {
+        height: 1.75rem;
+        line-height: 1.75rem;
+        border: 0;
+        outline: 0;
+        padding: 0;
+    }
+    
+    .task-completed {
+        text-decoration: line-through;
+        opacity: 0.5;
+    }
+    
+    .task-button {
+        width: 1.75rem;
+        height: 1.75rem;
+        padding: 0;
+        font-size: 1.25rem;
+        border-radius: 0.125rem;
+    
+        i {
+            display: flex;
+            justify-content: center;
+        }
+    }
+
+    .task-button-hover {
+        display: none;
+    }
 }
 
-.task-input {
-    border: 0;
-    outline: 0;
-}
-
-.task-completed {
-    text-decoration: line-through;
-    opacity: 0.5;
-}
-
-.task-button {
-    width: 1.75rem;
-    height: 1.75rem;
-    padding: 0;
-    font-size: 1.25rem;
-    border-radius: 0.125rem;
-
-    i {
-        display: flex;
-        justify-content: center;
+.task:hover {
+    .task-button-hover {
+        display: inline-block;
     }
 }
