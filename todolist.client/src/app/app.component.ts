@@ -5,13 +5,13 @@ import { Task } from 'models/task';
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css']
+    styleUrls: ['./app.component.scss']
 })
 
 export class AppComponent implements OnInit {
-    constructor(private http: HttpClient) {}
-
     public tasks: Task[] = [];
+
+    constructor(private http: HttpClient) {}
 
     ngOnInit() {
         this.getAllTasks();
@@ -75,6 +75,4 @@ export class AppComponent implements OnInit {
             }
         });
     }
-  
-    title = 'todolist.client';
 }
