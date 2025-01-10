@@ -1,16 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using TodoList.Server.Models;
+using TodoList.Server.Data.Models;
 
 namespace TodoList.Server.Data
 {
-	public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : DbContext
 	{
 		public ApplicationDbContext(DbContextOptions options) : base(options)
 		{
 		}
 
-		[Key]
-		public DbSet<Models.Task> Todos { get; set; }
+		public DbSet<TodoItem> TodoItems { get; set; }
 	}
 }

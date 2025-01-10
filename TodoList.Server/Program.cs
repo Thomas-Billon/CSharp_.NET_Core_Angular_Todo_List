@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using TodoList.Server.Data;
-using TodoList.Server.Repositories;
 using TodoList.Server.Services;
 using TodoList.Server.Services.Startup;
 
@@ -44,8 +43,7 @@ public static class ProgramExtensions
     {
         builder.Services.AddSingleton<IDbInitializerService, DbInitializerService>();
 
-        builder.Services.AddScoped<ITaskService, TaskService>();
-        builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+        builder.Services.AddScoped<ITodoItemService, TodoItemService>();
 
         return builder;
     }

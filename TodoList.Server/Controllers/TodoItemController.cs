@@ -1,28 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Numerics;
 using TodoList.Server.Services;
-using Task = TodoList.Server.Models.Task;
+using TodoList.Server.Data.Models;
 
 namespace TodoList.Server.Controllers
 {
-	[ApiController]
-	[Route("[controller]")]
-	public class TaskController : ControllerBase
+    [ApiController]
+	[Route("task")]
+	public class TodoItemController : ControllerBase
 	{
-		private readonly ITaskService _todoService;
+		private readonly ITodoItemService _todoItemService;
 
-		public TaskController(ITaskService todoService)
+		public TodoItemController(ITodoItemService todoItemService)
 		{
-			_todoService = todoService;
+			_todoItemService = todoItemService;
 		}
 
 		[HttpGet("")]
-		[Produces(typeof(IEnumerable<Task>))]
-		public ActionResult<IEnumerable<Task>> GetAllTasks()
+		public ActionResult<IEnumerable<TodoItem>> GetAllTasks()
 		{
 			try
 			{
-				IEnumerable<Task> tasks = _todoService.GetAllTasks();
+				IEnumerable<TodoItem> tasks = _todoItemService.GetAllTodoItems();
 
 				return Ok(tasks);
 			}
@@ -33,12 +31,11 @@ namespace TodoList.Server.Controllers
 		}
 
 		[HttpGet("{id}")]
-		[Produces(typeof(Task))]
-		public ActionResult<Task> GetTaskById(int id)
+		public ActionResult<TodoItem> GetTaskById(int id)
 		{
 			try
 			{
-				Task task = _todoService.GetTaskById(id);
+				TodoItem task = _todoItemService.GetTodoItemById(id);
 
 				return Ok(task);
 			}
@@ -54,12 +51,11 @@ namespace TodoList.Server.Controllers
 
 		
 		[HttpPost]
-		[Produces(typeof(int))]
-		public ActionResult<int> CreateTask(Task task)
+		public ActionResult<int> CreateTask(TodoItem task)
 		{
 			try
 			{
-				int id = _todoService.CreateTask(task);
+				int id = _todoItemService.CreateTodoItem(task);
 
 				return Ok(id);
 			}
@@ -74,12 +70,11 @@ namespace TodoList.Server.Controllers
 		}
 
 		[HttpPut]
-		[Produces(typeof(bool))]
-		public ActionResult<bool> UpdateTask(Task task)
+		public ActionResult<bool> UpdateTask(TodoItem task)
 		{
 			try
 			{
-				bool result = _todoService.UpdateTask(task);
+				bool result = _todoItemService.UpdateTodoItem(task);
 
 				return Ok(result);
 			}
@@ -94,12 +89,11 @@ namespace TodoList.Server.Controllers
 		}
 
 		[HttpDelete("{id}")]
-		[Produces(typeof(bool))]
 		public ActionResult<bool> DeleteTask(int id)
 		{
 			try
 			{
-				bool result = _todoService.DeleteTask(id);
+				bool result = _todoItemService.DeleteTodoItem(id);
 
 				return Ok(result);
 			}
