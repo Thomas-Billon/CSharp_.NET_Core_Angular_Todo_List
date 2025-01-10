@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TodoList.Server.Services;
-using TodoList.Server.Data.Models;
+using TodoList.Server.Queries;
+using System.Threading.Tasks;
 
 namespace TodoList.Server.Controllers
 {
@@ -15,97 +16,66 @@ namespace TodoList.Server.Controllers
 			_todoItemService = todoItemService;
 		}
 
-		[HttpGet("")]
-		public ActionResult<IEnumerable<TodoItem>> GetAllTasks()
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<TodoItemQuery>>> GetAllTasks()
 		{
-			try
-			{
-				IEnumerable<TodoItem> tasks = _todoItemService.GetAllTodoItems();
+			var todoItems = await _todoItemService.GetAll();
 
-				return Ok(tasks);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, ex.Message);
-			}
+			return Ok(todoItems);
 		}
 
 		[HttpGet("{id}")]
-		public ActionResult<TodoItem> GetTaskById(int id)
+		public async Task<ActionResult<TodoItemQuery>> GetTaskById(int id)
 		{
-			try
-			{
-				TodoItem task = _todoItemService.GetTodoItemById(id);
+			var todoItem = await _todoItemService.GetById(id);
 
-				return Ok(task);
-			}
-			catch (ArgumentException ex)
+			if (todoItem == null)
 			{
-				return StatusCode(404, ex.Message);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, ex.Message);
-			}
+				return StatusCode(400);
+            }
+
+			return Ok(todoItem);
 		}
 
 		
 		[HttpPost]
-		public ActionResult<int> CreateTask(TodoItem task)
-		{
-			try
-			{
-				int id = _todoItemService.CreateTodoItem(task);
+		public async Task<ActionResult<int>> CreateTask(TodoItemQuery model)
+        {
+            var todoItem = await _todoItemService.Create(model);
 
-				return Ok(id);
-			}
-			catch (ArgumentException ex)
-			{
-				return StatusCode(404, ex.Message);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, ex.Message);
-			}
+            if (todoItem == null)
+            {
+                return StatusCode(400);
+            }
+
+            return Ok(todoItem);
 		}
 
 		[HttpPut]
-		public ActionResult<bool> UpdateTask(TodoItem task)
-		{
-			try
-			{
-				bool result = _todoItemService.UpdateTodoItem(task);
+		public async Task<ActionResult<bool>> UpdateTask(TodoItemQuery model)
+        {
+            var result = await _todoItemService.Update(model);
 
-				return Ok(result);
-			}
-			catch (ArgumentException ex)
-			{
-				return StatusCode(404, ex.Message);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, ex.Message);
-			}
-		}
+            if (result == false)
+            {
+                return StatusCode(400);
+            }
+
+            return Ok();
+        }
 
 		[HttpDelete("{id}")]
-		public ActionResult<bool> DeleteTask(int id)
-		{
-			try
-			{
-				bool result = _todoItemService.DeleteTodoItem(id);
+		public async Task<ActionResult<bool>> DeleteTask(int id)
+        {
+            var result = await _todoItemService.Delete(id);
 
-				return Ok(result);
-			}
-			catch (ArgumentException ex)
-			{
-				return StatusCode(404, ex.Message);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, ex.Message);
-			}
-		}
+            if (result == false)
+            {
+                return StatusCode(400);
+            }
+
+            return Ok();
+        }
 		
 	}
 }

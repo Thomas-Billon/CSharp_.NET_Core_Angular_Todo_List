@@ -1,4 +1,4 @@
-﻿namespace TodoList.Server.Data.Models
+﻿namespace TodoList.Server.Models
 {
     public class TodoItem
     {

@@ -1,9 +1,12 @@
-﻿using TodoList.Server.Data.Models;
+﻿using Microsoft.EntityFrameworkCore;
 using TodoList.Server.Data;
+using TodoList.Server.Models;
+using TodoList.Server.Queries;
+using TodoList.Server.Services.Base;
 
 namespace TodoList.Server.Services
 {
-    public class TodoItemService : ITodoItemService
+    public class TodoItemService : ServiceBase, ITodoItemService
     {
         private readonly ApplicationDbContext _context;
 
@@ -12,58 +15,90 @@ namespace TodoList.Server.Services
             _context = context;
         }
 
-		public IEnumerable<TodoItem> GetAllTodoItems()
+		public async Task<IReadOnlyList<TodoItemQuery>> GetAll()
         {
-            return _context.TodoItems.Select(t => t);
+            return await _context.TodoItems.AsNoTracking()
+                .Select(TodoItemQuery.Select)
+                .ToListAsync();
         }
 
-		public TodoItem GetTodoItemById(int id)
+        public async Task<IReadOnlyList<TodoItemQuery>> GetAllCompletedItems()
         {
-            TodoItem? item = _context.TodoItems.FirstOrDefault(t => t.Id == id);
-            if (item == null)
+            return await _context.TodoItems.AsNoTracking()
+                .Where_IsCompleted()
+                .Select(TodoItemQuery.Select)
+                .ToListAsync();
+        }
+
+        public async Task<TodoItemQuery?> GetById(int id)
+        {
+            return await _context.TodoItems.AsNoTracking()
+                .Where(x => x.Id == id)
+                .Select(TodoItemQuery.Select)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<TodoItemQuery?> Create(TodoItemQuery query)
+        {
+            var data = query.ToTodoItem();
+
+            if (IsCreateValid(data) == false)
             {
-                throw new ArgumentException($"Error: Id {id} not found");
+                return null;
             }
 
-            return item;
+            _context.TodoItems.Add(data);
+
+            await _context.SaveChangesAsync();
+
+            return data.ToTodoItemQuery();
         }
 
-		public int CreateTodoItem(TodoItem item)
+        private bool IsCreateValid(TodoItem? data)
         {
-            _context.TodoItems.Add(item);
-            _context.SaveChanges();
-
-            return item.Id;
+            return true;
         }
 
-		public bool UpdateTodoItem(TodoItem item)
+        public async Task<bool> Update(TodoItemQuery query)
         {
-            TodoItem? dbItem = _context.TodoItems.FirstOrDefault(t => t.Id == item.Id);
-            if (dbItem == null)
+            var data = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == query.Id);
+            if (data == null || IsUpdateValid(data) == false)
             {
-                throw new ArgumentException($"Error: Id {item.Id} not found");
+                return false;
             }
 
-            dbItem.Id = item.Id;
-            dbItem.Label = item.Label;
-            dbItem.IsCompleted = item.IsCompleted;
-            _context.SaveChanges();
+            data.Id = query.Id;
+            data.Label = query.Label;
+            data.IsCompleted = query.IsCompleted;
+
+            await _context.SaveChangesAsync();
 
             return true;
         }
 
-		public bool DeleteTodoItem(int id)
+        private bool IsUpdateValid(TodoItem? data)
         {
-            TodoItem? task = _context.TodoItems.FirstOrDefault(t => t.Id == id);
-            if (task == null)
+            return true;
+        }
+
+        public async Task<bool> Delete(int id)
+        {
+            var data = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id);
+            if (data == null || IsDeleteValid(data) == false)
             {
-                throw new ArgumentException($"Error: Id {id} not found");
+                return false;
             }
 
-            _context.TodoItems.Remove(task);
-            _context.SaveChanges();
+            _context.TodoItems.Remove(data);
+
+            await _context.SaveChangesAsync();
 
             return true;
         }
-	}
+
+        private bool IsDeleteValid(TodoItem? data)
+        {
+            return true;
+        }
+    }
 }

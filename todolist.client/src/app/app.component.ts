@@ -35,9 +35,14 @@ export class AppComponent implements OnInit {
     }
 
     createTask(task: Task) {
-        this.http.post<number>('/task', task).subscribe({
+        this.http.post<Task>('/task', task).subscribe({
             next: (result) => {
-                task.id = result;
+                if (!result) {
+                    console.error(result);
+                    return;
+                }
+
+                task.id = result.id;
                 this.tasks.push(task);
                 this.resetNewTask();
             },
@@ -50,12 +55,6 @@ export class AppComponent implements OnInit {
     updateTask(task: Task) {
         this.http.put<boolean>('/task', task).subscribe({
             next: (result) => {
-                if (!result)
-                {
-                    console.error(result);
-                    return;
-                }
-
                 const index = this.tasks.findIndex(t => t.id == task.id);
                 this.tasks[index] = task;
             },
@@ -68,12 +67,6 @@ export class AppComponent implements OnInit {
     deleteTask(id: number) {
         this.http.delete<boolean>(`/task/${id}`).subscribe({
             next: (result) => {
-                if (!result)
-                {
-                    console.error(result);
-                    return;
-                }
-                
                 const index = this.tasks.findIndex(t => t.id == id);
                 this.tasks.splice(index, 1);
             },

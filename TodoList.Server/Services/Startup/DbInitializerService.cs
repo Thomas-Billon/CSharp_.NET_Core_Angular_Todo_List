@@ -16,7 +16,7 @@ namespace TodoList.Server.Services.Startup
 			}
 			catch (Exception ex)
 			{
-				logger.LogError(ex, "An error occurred initializing the database context.");
+				logger.LogError(ex, "Error: Database context could not be initialized");
 				throw;
 			}
 		}
