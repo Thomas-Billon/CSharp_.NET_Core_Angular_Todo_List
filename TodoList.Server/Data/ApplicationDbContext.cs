@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TodoList.Server.Models;
+using TodoList.Server.Entities;
 
 namespace TodoList.Server.Data
 {

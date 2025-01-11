@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TodoList.Server.Entities;
 using TodoList.Server.Services;
-using TodoList.Server.Queries;
-using System.Threading.Tasks;
 
 namespace TodoList.Server.Controllers
 {
@@ -17,7 +16,7 @@ namespace TodoList.Server.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<TodoItemQuery>>> GetAllTasks()
+		public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetAllTasks()
 		{
 			var todoItems = await _todoItemService.GetAll();
 
@@ -25,7 +24,7 @@ namespace TodoList.Server.Controllers
 		}
 
 		[HttpGet("{id}")]
-		public async Task<ActionResult<TodoItemQuery>> GetTaskById(int id)
+		public async Task<ActionResult<TodoItemDTO>> GetTaskById(int id)
 		{
 			var todoItem = await _todoItemService.GetById(id);
 
@@ -39,7 +38,7 @@ namespace TodoList.Server.Controllers
 
 		
 		[HttpPost]
-		public async Task<ActionResult<int>> CreateTask(TodoItemQuery model)
+		public async Task<ActionResult<int>> CreateTask(TodoItemDTO model)
         {
             var todoItem = await _todoItemService.Create(model);
 
@@ -52,7 +51,7 @@ namespace TodoList.Server.Controllers
 		}
 
 		[HttpPut]
-		public async Task<ActionResult<bool>> UpdateTask(TodoItemQuery model)
+		public async Task<ActionResult<bool>> UpdateTask(TodoItemDTO model)
         {
             var result = await _todoItemService.Update(model);
 
