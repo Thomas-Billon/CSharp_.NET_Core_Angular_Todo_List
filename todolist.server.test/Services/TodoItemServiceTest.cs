@@ -90,19 +90,19 @@ namespace todolist.server.test.Services
                 new()
                 {
                     Id = 1,
-                    Label = "Hello",
+                    Title = "Hello",
                     IsCompleted = false
                 },
                 new()
                 {
                     Id = 2,
-                    Label = "world",
+                    Title = "world",
                     IsCompleted = false
                 },
                 new()
                 {
                     Id = 3,
-                    Label = "!",
+                    Title = "!",
                     IsCompleted = true
                 }
             };

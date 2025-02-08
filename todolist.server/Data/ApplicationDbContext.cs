@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using todolist.server.Data.Configurations;
 using TodoList.Server.Entities;
 
 namespace TodoList.Server.Data
@@ -9,6 +10,15 @@ namespace TodoList.Server.Data
 		{
 		}
 
-		public virtual DbSet<TodoItem> TodoItems { get; set; }
-	}
+        public virtual DbSet<TodoGroup> TodoGroups { get; set; }
+        public virtual DbSet<TodoItem> TodoItems { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            TodoGroupConfiguration.OnModelCreating(modelBuilder);
+            TodoItemConfiguration.OnModelCreating(modelBuilder);
+        }
+    }
 }
