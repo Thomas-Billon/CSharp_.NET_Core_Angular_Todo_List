@@ -1,22 +1,21 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgClickOutsideDirective } from 'ng-click-outside2';
 
 import { AppComponent } from './app.component';
-import { TaskComponent } from './task/task.component';
+import { TaskModule } from '@/components/task/task.module';
 
 @NgModule({
     declarations: [
-        AppComponent,
-        TaskComponent
+        AppComponent
     ],
     imports: [
         BrowserModule,
         HttpClientModule,
-        NgClickOutsideDirective
+        TaskModule
     ],
     providers: [],
     bootstrap: [AppComponent]
 })
+
 export class AppModule { }

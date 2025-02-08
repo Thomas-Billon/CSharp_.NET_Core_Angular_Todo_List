@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Task } from 'models/task';
+import { Task } from '@/entities/task';
 
 @Component({
     selector: 'app-root',
@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
     }
 
     resetNewTask() {
-        this.newTask = {id: 0, label: '', isCompleted: false};
+        this.newTask = {id: 0, title: '', isCompleted: false};
     }
 
     getAllTasks() {

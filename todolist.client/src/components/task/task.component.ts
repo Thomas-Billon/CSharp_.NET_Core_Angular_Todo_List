@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Task } from 'models/task';
+import { Task } from '@/entities/task';
 
 @Component({
   selector: '[app-task]',
@@ -8,26 +8,27 @@ import { Task } from 'models/task';
 })
 
 export class TaskComponent {
-    public isLabelSelected: boolean = false;
+    public isTitleSelected: boolean = false;
 
     @Input() task!: Task;
     @Input() isNew: boolean = false;
+
     @Output() create = new EventEmitter<Task>();
     @Output() update = new EventEmitter<Task>();
     @Output() delete = new EventEmitter<Task>();
 
     ngOnInit() {
-        this.isLabelSelected = this.isNew;
+        this.isTitleSelected = this.isNew;
     }
 
-    editLabel(label: string) {
-        this.task.label = label;
+    editTitle(title: string) {
+        this.task.title = title;
 
         if (this.isNew) {
             this.create.emit();
         }
         else {
-            this.isLabelSelected = false;
+            this.isTitleSelected = false;
             this.update.emit();
         }
     }
@@ -43,12 +44,12 @@ export class TaskComponent {
         }
     }
 
-    selectLabel(event: Event) {
+    selectTitle(event: Event) {
         if (this.isNew) {
             return;
         }
 
-        this.isLabelSelected = true;
+        this.isTitleSelected = true;
 
         // Set timeout to reflect correct data state and focus properly
         setTimeout(() => {
@@ -56,15 +57,15 @@ export class TaskComponent {
         },0); 
     }
 
-    unselectLabel(event: Event) {
+    unselectTitle(event: Event) {
         if (this.isNew) {
             return;
         }
 
-        // Exclude label to avoid unselecting immediately
-        if ((event.target as HTMLElement).id != `label-${this.task.id}`)
+        // Exclude title to avoid unselecting immediately
+        if ((event.target as HTMLElement).id != `title-${this.task.id}`)
         {
-            this.isLabelSelected = false;
+            this.isTitleSelected = false;
         }
     }
 }
