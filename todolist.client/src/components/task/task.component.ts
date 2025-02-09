@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Task } from '@/entities/task';
+import { Component, Input, OnInit } from '@angular/core';
+import { DefaultTask, Task } from '@/models/task';
 
 @Component({
   selector: '[app-task]',
@@ -8,64 +8,37 @@ import { Task } from '@/entities/task';
 })
 
 export class TaskComponent {
-    public isTitleSelected: boolean = false;
-
-    @Input() task!: Task;
+    @Input() taskData?: Task;
     @Input() isNew: boolean = false;
 
-    @Output() create = new EventEmitter<Task>();
-    @Output() update = new EventEmitter<Task>();
-    @Output() delete = new EventEmitter<Task>();
+    public task: Task = this.taskData ?? DefaultTask;
+    public isSelected: boolean = false;
 
-    ngOnInit() {
-        this.isTitleSelected = this.isNew;
-    }
-
-    editTitle(title: string) {
+    changeTitle(title: string): void {
         this.task.title = title;
-
-        if (this.isNew) {
-            this.create.emit();
-        }
-        else {
-            this.isTitleSelected = false;
-            this.update.emit();
-        }
     }
 
-    editIsCompleted(isCompleted: boolean) {
+    changeIsCompleted(isCompleted: boolean): void {
         this.task.isCompleted = isCompleted;
-
-        if (this.isNew) {
-            this.create.emit();
-        }
-        else {
-            this.update.emit();
-        }
     }
 
-    selectTitle(event: Event) {
-        if (this.isNew) {
-            return;
-        }
+    create() {
 
-        this.isTitleSelected = true;
-
-        // Set timeout to reflect correct data state and focus properly
-        setTimeout(() => {
-            (document.querySelector(`#input-${this.task.id}`) as HTMLElement).focus();
-        },0); 
     }
 
-    unselectTitle(event: Event) {
-        if (this.isNew) {
-            return;
-        }
+    update() {
 
-        // Exclude title to avoid unselecting immediately
-        if ((event.target as HTMLElement).id != `title-${this.task.id}`)
-        {
-            this.isTitleSelected = false;
-        }
+    }
+
+    delete() {
+        
+    }
+
+    onSelect() {
+        this.isSelected = true;
+    }
+
+    onUnselect() {
+        this.isSelected = false;
     }
 }

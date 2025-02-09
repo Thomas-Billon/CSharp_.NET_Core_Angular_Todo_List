@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Task } from '@/entities/task';
+import { Task } from '@/models/task';
+import { TaskService } from '@/services/task.service';
 
 @Component({
     selector: 'app-root',
@@ -12,7 +12,7 @@ export class AppComponent implements OnInit {
     public tasks: Task[] = [];
     public newTask!: Task;
 
-    constructor(private http: HttpClient) {}
+    constructor(private taskService: TaskService) {}
 
     ngOnInit() {
         this.getAllTasks();
@@ -24,14 +24,7 @@ export class AppComponent implements OnInit {
     }
 
     getAllTasks() {
-        this.http.get<Task[]>('/task').subscribe({
-            next: (result) => {
-                this.tasks = result;
-            },
-            error: (e) => {
-                console.error(e);
-            }
-        });
+        this.
     }
 
     createTask(task: Task) {

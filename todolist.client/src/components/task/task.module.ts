@@ -1,9 +1,8 @@
-import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgClickOutsideDirective } from 'ng-click-outside2';
-
 import { TaskComponent } from './task.component';
+import { TaskService } from '@/services/task.service';
 
 @NgModule({
     declarations: [
@@ -14,10 +13,9 @@ import { TaskComponent } from './task.component';
     ],
     imports: [
         CommonModule,
-        HttpClientModule,
         NgClickOutsideDirective
     ],
-    providers: []
+    providers: [TaskService]
 })
 
 export class TaskModule { }

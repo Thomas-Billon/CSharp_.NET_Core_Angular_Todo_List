@@ -1,47 +1,45 @@
-<td class="table-col-3 py-1">
-    <input
-        type="checkbox"
-        class="task-checkbox"
-        [ngClass]="{ 'disabled': isNew }"
-        [checked]="task.isCompleted"
-        [attr.disabled]="isNew ? true : null"
-        (change)="editIsCompleted(!task.isCompleted);"
-    />
-</td>
-<td class="py-1 px-0">
-    <div
-        id="{{ 'title-' + task.id }}"
-        class="task-title w-100 text-left font-weight-bold"
-        [ngClass]="{ 'd-none': isTitleSelected, 'task-completed': task.isCompleted }"
-        (click)="selectTitle($event)">
-        {{ task.title }}
-    </div>
-    <input
-        #newTaskTitle
-        id="{{ 'input-' + task.id }}"
-        class="task-input w-100 bg-transparent"
-        placeholder="{{ isNew ? 'Add new task' : 'Edit task' }}"
-        [value]="task.title"
-        [ngClass]="{ 'd-none': !isTitleSelected }"
-        (clickOutside)="unselectTitle($event);"
-        (keyup.enter)="editTitle(newTaskTitle.value);"
-    />
-</td>
-<td class="table-col-3 py-1">
-    <button
-        class="btn btn-primary task-button task-button-hover"
-        [ngClass]="{'d-none': isTitleSelected}"
-        (click)="delete.emit();">
-        <i class="fa fa-trash"></i>
-    </button>
-    <button
-        *ngIf="isTitleSelected"
-        class="btn btn-primary task-button"
-        [ngClass]="{ 'd-none': !isTitleSelected }"
-        (click)="editTitle(newTaskTitle.value);">
-        <i
-            class="fa"
-            [ngClass]="isNew ? 'fa-plus' : 'fa-pencil'">
-        </i>
-    </button>
-</td>
+<ng-container (click)="onSelect()" (clickOutside)="onUnselect()">
+    <td class="py-1">
+        <input
+            type="checkbox"
+            class="task-checkbox"
+            [ngClass]="{ 'disabled': isNew }"
+            [attr.disabled]="isNew ? true : null"
+            [checked]="task.isCompleted"
+            (change)="changeIsCompleted(!task.isCompleted)"
+        />
+    </td>
+    <td class="py-1">
+        <div
+            class="task-title w-100 text-left font-weight-bold"
+            [ngClass]="{ 'd-none': isSelected }"
+        >
+            {{ task.title }}
+        </div>
+        <input
+            #newTaskTitle
+            class="task-input w-100 bg-transparent"
+            placeholder="{{ isNew ? 'Add new task' : 'Edit task' }}"
+            [value]="task.title"
+            [ngClass]="{ 'd-none': !isSelected }"
+            (keyup.enter)="changeTitle(newTaskTitle.value);"
+        />
+    </td>
+    <td class="py-1">
+        <button
+            class="btn btn-primary task-button"
+            [ngClass]="{'d-none': isSelected}"
+            (click)="delete();">
+            <i class="fa fa-trash"></i>
+        </button>
+        <button
+            class="btn btn-primary task-button"
+            [ngClass]="{ 'd-none': !isSelected }"
+            (click)="isNew ? create() : update()">
+            <i
+                class="fa"
+                [ngClass]="isNew ? 'fa-plus' : 'fa-pencil'">
+            </i>
+        </button>
+    </td>
+</ng-container>
