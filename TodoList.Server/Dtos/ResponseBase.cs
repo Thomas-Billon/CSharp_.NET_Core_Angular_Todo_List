@@ -2,6 +2,6 @@
 {
     public abstract class ResponseBase
     {
-        public required bool IsSuccess { get; set; }
+        public bool IsSuccess { get; set; }
     }
 }

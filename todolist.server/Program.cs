@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TodoList.Server.Data;
 using TodoList.Server.Data.Startup;
+using TodoList.Server.Mappers;
 using TodoList.Server.Services;
 
 
@@ -45,6 +46,9 @@ public static class ProgramExtensions
 
         builder.Services.AddScoped<TodoGroupService>();
         builder.Services.AddScoped<TodoItemService>();
+
+        builder.Services.AddSingleton<TodoGroupMapper>();
+        builder.Services.AddSingleton<TodoItemMapper>();
 
         return builder;
     }

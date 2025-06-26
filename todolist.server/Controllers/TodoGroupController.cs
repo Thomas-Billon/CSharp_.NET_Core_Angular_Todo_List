@@ -43,7 +43,7 @@ namespace TodoList.Server.Controllers
         {
             return HandleRequest(
                 command,
-                _mapper.ToModel,
+                _mapper.ToEntity,
                 entity => _todoGroupService.Create(entity),
                 _mapper.ToResponse
             );
@@ -54,7 +54,7 @@ namespace TodoList.Server.Controllers
         {
             return HandleRequest(
                 command,
-                _mapper.ToModel,
+                _mapper.ToEntity,
                 entity => _todoGroupService.Update(id, entity),
                 _mapper.ToResponse
             );
@@ -63,11 +63,11 @@ namespace TodoList.Server.Controllers
         [HttpPut("{id:int}/title")]
         public async Task<ActionResult<string>> UpdateTitle(int id, TodoGroupDTO.UpdateTitle.Command command)
         {
-            var model = _mapper.ToModel(command);
+            var entity = _mapper.ToEntity(command);
 
             try
             {
-                model = await _todoGroupService.UpdateTitle(id, model);
+                entity = await _todoGroupService.UpdateTitle(id, entity);
             }
             catch (Exception ex) when (ex is ArgumentException || ex is DbUpdateException)
             {
@@ -78,7 +78,7 @@ namespace TodoList.Server.Controllers
                 return StatusCode(500);
             }
 
-            var response = _mapper.ToResponse(model);
+            var response = _mapper.ToResponse(entity);
 
             return Ok(response);
         }

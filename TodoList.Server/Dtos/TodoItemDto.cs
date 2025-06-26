@@ -4,6 +4,16 @@ namespace TodoList.Server.Dtos
 {
     public class TodoItemDTO
     {
+        public class Get
+        {
+            public class Response : ResponseBase
+            {
+                public required int Id { get; set; }
+                public required string Title { get; set; }
+                public required bool IsCompleted { get; set; }
+            }
+        }
+
         public class Create
         {
             public class Command
@@ -32,6 +42,19 @@ namespace TodoList.Server.Dtos
             {
                 public required string Title { get; set; }
                 public required bool IsCompleted { get; set; }
+            }
+        }
+
+        public class UpdateTitle
+        {
+            public class Command
+            {
+                public required string Title { get; set; }
+            }
+
+            public class Response : ResponseBase
+            {
+                public required string Title { get; set; }
             }
         }
     }

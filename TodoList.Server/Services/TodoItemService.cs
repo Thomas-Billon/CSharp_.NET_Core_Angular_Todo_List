@@ -37,7 +37,7 @@ namespace TodoList.Server.Services
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<TodoItem?> Create(TodoItem entity)
+        public async Task<TodoItem> Create(TodoItem entity)
         {
             Validate(entity, nameof(Create));
 
@@ -50,20 +50,20 @@ namespace TodoList.Server.Services
             return entity;
         }
 
-        public async Task<TodoItem> Update(int id, TodoItem model)
+        public async Task<TodoItem> Update(int id, TodoItem entity)
         {
-            Validate(model, nameof(Update));
+            Validate(entity, nameof(Update));
 
             var updateCount = await _context.TodoItems
                 .Where(x => x.Id == id)
                 .ExecuteUpdateAsync(setters => setters
-                    .SetProperty(x => x.Title, model.Title)
-                    .SetProperty(x => x.IsCompleted, model.IsCompleted)
+                    .SetProperty(x => x.Title, entity.Title)
+                    .SetProperty(x => x.IsCompleted, entity.IsCompleted)
                 );
 
             EnsureUpdated(updateCount);
 
-            return model;
+            return entity;
         }
 
         public async Task<string> UpdateTitle(int id, string title)
@@ -115,21 +115,21 @@ namespace TodoList.Server.Services
             }
         }
 
-        private void Validate(TodoItem model, string operation)
+        private void Validate(TodoItem entity, string operation)
         {
-            if (!IsValid(model))
+            if (!IsValid(entity))
             {
-                throw new ArgumentException(nameof(model), $"Parameter is invalid for {operation}");
+                throw new ArgumentException(nameof(entity), $"Parameter is invalid for {operation}");
             }
         }
 
-        private bool IsValid(TodoItem model) => IsTitleValid(model.Title);
+        private bool IsValid(TodoItem entity) => IsTitleValid(entity.Title);
 
         private bool IsTitleValid(string title) => title != null;
 
-        private void EnsureCreated(TodoItem model)
+        private void EnsureCreated(TodoItem entity)
         {
-            if (model == null)
+            if (entity == null)
             {
                 throw new DbUpdateException("No entries were created");
             }
