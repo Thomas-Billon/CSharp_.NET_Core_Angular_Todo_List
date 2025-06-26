@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TodoList.Server.Data;
 using TodoList.Server.Services;
-using TodoList.Server.Services.Startup;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,7 +42,7 @@ public static class ProgramExtensions
     {
         builder.Services.AddSingleton<IDbInitializerService, DbInitializerService>();
 
-        builder.Services.AddScoped<ITodoItemService, TodoItemService>();
+        builder.Services.AddScoped<TodoItemService>();
 
         return builder;
     }

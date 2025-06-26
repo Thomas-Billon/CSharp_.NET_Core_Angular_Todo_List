@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using TodoList.Server.Data;
+using TodoList.Server.Dtos;
 using TodoList.Server.Models;
 using TodoList.Server.Queries;
-using TodoList.Server.Services.Base;
 
 namespace TodoList.Server.Services
 {
-    public class TodoItemService : ServiceBase, ITodoItemService
+    public class TodoItemService : ServiceBase
     {
         private readonly ApplicationDbContext _context;
 
@@ -30,75 +31,118 @@ namespace TodoList.Server.Services
                 .ToListAsync();
         }
 
-        public async Task<TodoItemQuery?> GetById(int id)
+        public Task<TodoItemQuery?> GetById(int id)
         {
-            return await _context.TodoItems.AsNoTracking()
+            return _context.TodoItems.AsNoTracking()
                 .Where(x => x.Id == id)
                 .Select(TodoItemQuery.Select)
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<TodoItemQuery?> Create(TodoItemQuery query)
+        public async Task<TodoItem> Create(TodoItem model)
         {
-            var data = query.ToTodoItem();
+            Validate(model, nameof(Create));
 
-            if (IsCreateValid(data) == false)
-            {
-                return null;
-            }
-
-            _context.TodoItems.Add(data);
+            _context.TodoItems.Add(model);
 
             await _context.SaveChangesAsync();
 
-            return data.ToTodoItemQuery();
+            EnsureCreated(model);
+
+            return model;
         }
 
-        private bool IsCreateValid(TodoItem? data)
+        public async Task<TodoItem> Update(int id, TodoItem model)
         {
-            return true;
+            Validate(model, nameof(Update));
+
+            var updateCount = await _context.TodoItems
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.Label, model.Label)
+                    .SetProperty(x => x.IsCompleted, model.IsCompleted)
+                );
+
+            EnsureUpdated(updateCount);
+
+            return model;
         }
 
-        public async Task<bool> Update(TodoItemQuery query)
+        public async Task<string> UpdateLabel(int id, string label)
         {
-            var data = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == query.Id);
-            if (data == null || IsUpdateValid(data) == false)
+            if (!IsLabelValid(label))
             {
-                return false;
+                throw new ArgumentException(nameof(label), "Parameter is invalid for update");
             }
 
-            data.Id = query.Id;
-            data.Label = query.Label;
-            data.IsCompleted = query.IsCompleted;
+            var updateCount = await _context.TodoItems
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.Label, label)
+                );
 
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
-        private bool IsUpdateValid(TodoItem? data)
-        {
-            return true;
-        }
-
-        public async Task<bool> Delete(int id)
-        {
-            var data = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id);
-            if (data == null || IsDeleteValid(data) == false)
+            if (updateCount != 1)
             {
-                return false;
+                throw new DbUpdateException("No entries were updated");
             }
 
-            _context.TodoItems.Remove(data);
-
-            await _context.SaveChangesAsync();
-
-            return true;
+            return label;
         }
 
-        private bool IsDeleteValid(TodoItem? data)
+        public async Task<bool> UpdateIsCompleted(int id, bool isCompleted)
         {
-            return true;
+            var updateCount = await _context.TodoItems
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.IsCompleted, isCompleted)
+                );
+
+            if (updateCount != 1)
+            {
+                throw new DbUpdateException("No entries were updated");
+            }
+
+            return isCompleted;
+        }
+
+        public async Task Delete(int id)
+        {
+            var deleteCount = await _context.TodoItems
+                .Where(x => x.Id == id)
+                .ExecuteDeleteAsync();
+
+            if (deleteCount != 1)
+            {
+                throw new DbUpdateException("No entries were deleted");
+            }
+        }
+
+        private void Validate(TodoItem model, string operation)
+        {
+            if (!IsValid(model))
+            {
+                throw new ArgumentException(nameof(model), $"Parameter is invalid for {operation}");
+            }
+        }
+
+        private bool IsValid(TodoItem model) => IsLabelValid(model.Label);
+
+        private bool IsLabelValid(string label) => label != null;
+
+        private void EnsureCreated(TodoItem model)
+        {
+            if (model == null)
+            {
+                throw new DbUpdateException("No entries were created");
+            }
+        }
+
+        private void EnsureUpdated(int updateCount)
+        {
+            if (updateCount != 1)
+            {
+                throw new DbUpdateException("No entries were updated");
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace TodoList.Server.Services.Base
+﻿namespace TodoList.Server.Services
 {
     public abstract class ServiceBase
     {

@@ -5,16 +5,16 @@ namespace TodoList.Server.Queries
 {
     public class TodoItemQuery
     {
-        public int Id { get; set; }
+        public required int Id { get; set; }
         public required string Label { get; set; }
-        public bool IsCompleted { get; set; }
+        public required bool IsCompleted { get; set; }
 
-        public static Expression<Func<TodoItem, TodoItemQuery>> Select => x => x.ToTodoItemQuery();
+        public static Expression<Func<TodoItem, TodoItemQuery>> Select => x => x.ToQuery();
     }
 
-    public static class TodoItemQueryExtensions
+    public static class TodoItemQueryExtension
     {
-        public static TodoItemQuery ToTodoItemQuery(this TodoItem x)
+        public static TodoItemQuery ToQuery(this TodoItem x)
         {
             return new TodoItemQuery
             {
@@ -24,7 +24,7 @@ namespace TodoList.Server.Queries
             };
         }
 
-        public static TodoItem ToTodoItem(this TodoItemQuery x)
+        public static TodoItem ToModel(this TodoItemQuery x)
         {
             return new TodoItem
             {

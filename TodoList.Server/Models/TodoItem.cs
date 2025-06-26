@@ -3,7 +3,7 @@
     public class TodoItem
     {
         public int Id { get; set; }
-        public required string Label { get; set; }
-        public bool IsCompleted { get; set; }
+        public string Label { get; set; } = string.Empty;
+        public bool IsCompleted { get; set; } = false;
     }
 }
