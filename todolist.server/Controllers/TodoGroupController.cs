@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TodoList.Server.Dtos;
+using TodoList.Server.Mappers;
 using TodoList.Server.Queries;
 using TodoList.Server.Services;
 
@@ -11,96 +12,73 @@ namespace TodoList.Server.Controllers
 	public class TodoGroupController : CustomControllerBase
     {
 		private readonly TodoGroupService _todoGroupService;
+        private readonly TodoGroupMapper _todoGroupMapper;
 
-		public TodoGroupController(TodoGroupService todoGroupService)
-		{
+        public TodoGroupController(
+            TodoGroupService todoGroupService,
+            TodoGroupMapper todoGroupMapper
+        ) {
 			_todoGroupService = todoGroupService;
-		}
+            _todoGroupMapper = todoGroupMapper;
+        }
 
-		[HttpGet]
-		public async Task<ActionResult<IEnumerable<TodoGroupQuery>>> GetAll()
-		{
-			var todoItems = await _todoGroupService.GetAll();
+        [HttpGet]
+        public Task<ActionResult<TodoGroupDTO.GetAll.Response>> GetAll()
+        {
+            return HandleRequest(
+                async () => await _todoGroupService.GetAll(),
+                _todoGroupMapper.ToGetAllResponse
+            );
+        }
 
-			return Ok(todoItems);
-		}
+        [HttpGet("{id:int}")]
+        public Task<ActionResult<TodoGroupDTO.Get.Response>> GetById(int id)
+        {
+            return HandleRequest(
+                async () => await _todoGroupService.GetById(id),
+                _todoGroupMapper.ToGetResponse
+            );
+        }
 
-		[HttpGet("{id:int}")]
-		public async Task<ActionResult<TodoGroupQuery>> GetById(int id)
-		{
-			var todoItem = await _todoGroupService.GetById(id);
-
-			if (todoItem == null)
-			{
-				return StatusCode(400);
-            }
-
-			return Ok(todoItem);
-		}
-
-		[HttpPost]
-		public Task<ActionResult<int>> Create(TodoGroupDTO.Create.Command command)
+        [HttpPost]
+        public Task<ActionResult<TodoGroupDTO.Create.Response>> Create(TodoGroupDTO.Create.Command command)
         {
             return HandleRequest(
                 command,
-                _mapper.ToEntity,
-                entity => _todoGroupService.Create(entity),
-                _mapper.ToResponse
+                _todoGroupMapper.ToEntity,
+                async entity => await _todoGroupService.Create(entity),
+                _todoGroupMapper.ToCreateResponse
             );
         }
 
         [HttpPut("{id:int}")]
-        public Task<ActionResult<TodoGroupDTO.Update>> Update(int id, TodoGroupDTO.Update.Command command)
+        public Task<ActionResult<TodoGroupDTO.Update.Response>> Update(int id, TodoGroupDTO.Update.Command command)
         {
             return HandleRequest(
                 command,
-                _mapper.ToEntity,
-                entity => _todoGroupService.Update(id, entity),
-                _mapper.ToResponse
+                _todoGroupMapper.ToEntity,
+                async entity => await _todoGroupService.Update(id, entity),
+                _todoGroupMapper.ToUpdateResponse
             );
         }
 
         [HttpPut("{id:int}/title")]
-        public async Task<ActionResult<string>> UpdateTitle(int id, TodoGroupDTO.UpdateTitle.Command command)
+        public Task<ActionResult<TodoGroupDTO.UpdateTitle.Response>> UpdateTitle(int id, TodoGroupDTO.UpdateTitle.Command command)
         {
-            var entity = _mapper.ToEntity(command);
-
-            try
-            {
-                entity = await _todoGroupService.UpdateTitle(id, entity);
-            }
-            catch (Exception ex) when (ex is ArgumentException || ex is DbUpdateException)
-            {
-                return StatusCode(400);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
-
-            var response = _mapper.ToResponse(entity);
-
-            return Ok(response);
+            return HandleRequest(
+                command,
+                _todoGroupMapper.ToTitle,
+                async title => await _todoGroupService.UpdateTitle(id, title),
+                _todoGroupMapper.ToUpdateTitleResponse
+            );
         }
 
         [HttpDelete("{id:int}")]
-		public async Task<ActionResult> Delete(int id)
+        public Task<ActionResult<ResponseBase>> Delete(int id)
         {
-            try
-            {
-                await _todoGroupService.Delete(id);
-            }
-            catch (Exception ex) when (ex is ArgumentException || ex is DbUpdateException)
-            {
-                return StatusCode(400);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
-
-            return Ok();
+            return HandleRequest(
+                async () => await _todoGroupService.Delete(id)
+            );
         }
-		
-	}
+    }
 }

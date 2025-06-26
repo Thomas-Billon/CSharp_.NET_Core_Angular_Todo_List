@@ -92,6 +92,5 @@ namespace TodoList.Server.Controllers
                 async () => await _todoItemService.Delete(id)
             );
         }
-		
-	}
+    }
 }

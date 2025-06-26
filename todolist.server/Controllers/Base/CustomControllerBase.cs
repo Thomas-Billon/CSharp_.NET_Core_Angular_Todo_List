@@ -6,16 +6,19 @@ namespace TodoList.Server.Controllers
 {
     public abstract class CustomControllerBase : ControllerBase
     {
+        private abstract record ServiceCallVariant;
+        private record NoCommandNoResponse(Func<Task> Call) : ServiceCallVariant;
+        private record CommandNoResponse<TEntity>(Func<TEntity, Task> Call) : ServiceCallVariant;
+        private record NoCommandWithResponse<TEntity>(Func<Task<TEntity?>> Call) : ServiceCallVariant;
+        private record CommandWithResponse<TEntity>(Func<TEntity, Task<TEntity?>> Call) : ServiceCallVariant;
+
         protected Task<ActionResult<ResponseBase>> HandleRequest(
             Func<Task> serviceCall
         ) {
             return HandleRequestInternal<object, object, ResponseBase>(
                 command: null,
                 mapCommand: null,
-                serviceCall,
-                null,
-                null,
-                null,
+                serviceCall: new NoCommandNoResponse(serviceCall),
                 mapResponse: null
             );
         }
@@ -28,10 +31,7 @@ namespace TodoList.Server.Controllers
             return HandleRequestInternal<TCommand, TEntity, ResponseBase>(
                 command,
                 mapCommand,
-                null,
-                serviceCall,
-                null,
-                null,
+                serviceCall: new CommandNoResponse<TEntity>(serviceCall),
                 mapResponse: null
             );
         }
@@ -45,10 +45,7 @@ namespace TodoList.Server.Controllers
             return HandleRequestInternal<object, TEntity, TResponse>(
                 command: null,
                 mapCommand: null,
-                null,
-                null,
-                serviceCall,
-                null,
+                serviceCall: new NoCommandWithResponse<TEntity>(serviceCall),
                 mapResponse
             );
         }
@@ -64,10 +61,7 @@ namespace TodoList.Server.Controllers
             return HandleRequestInternal(
                 command,
                 mapCommand,
-                null,
-                null,
-                null,
-                serviceCall,
+                serviceCall: new CommandWithResponse<TEntity>(serviceCall),
                 mapResponse
             );
         }
@@ -75,21 +69,11 @@ namespace TodoList.Server.Controllers
         private async Task<ActionResult<TResponse>> HandleRequestInternal<TCommand, TEntity, TResponse>(
             TCommand? command,
             Func<TCommand, TEntity>? mapCommand,
-            Func<Task>? serviceCallWithoutCommandAndWithoutResponse,
-            Func<TEntity, Task>? serviceCallWithCommandAndWithoutResponse,
-            Func<Task<TEntity?>>? serviceCallWithoutCommandAndWithResponse,
-            Func<TEntity, Task<TEntity?>>? serviceCallWithCommandAndWithResponse,
+            ServiceCallVariant serviceCall,
             Func<TEntity, TResponse>? mapResponse
         )
             where TResponse : ResponseBase
         {
-            if (serviceCallWithoutCommandAndWithoutResponse == null &&
-                serviceCallWithCommandAndWithoutResponse == null &&
-                serviceCallWithoutCommandAndWithResponse == null &&
-                serviceCallWithCommandAndWithResponse == null)
-            {
-                return StatusCode(500);
-            }
             if (!ModelState.IsValid)
             {
                 return StatusCode(400);
@@ -97,40 +81,9 @@ namespace TodoList.Server.Controllers
 
             try
             {
-                var entity = default(TEntity);
-
-                if (command != null && mapCommand != null)
-                {
-                    if (serviceCallWithCommandAndWithoutResponse != null)
-                    {
-                        await serviceCallWithCommandAndWithoutResponse(mapCommand(command));
-                    }
-                    if (serviceCallWithCommandAndWithResponse != null)
-                    {
-                        entity = await serviceCallWithCommandAndWithResponse(mapCommand(command));
-                    }
-                }
-                if (serviceCallWithoutCommandAndWithoutResponse != null)
-                {
-                    await serviceCallWithoutCommandAndWithoutResponse();
-                }
-                if (serviceCallWithoutCommandAndWithResponse != null)
-                {
-                    entity = await serviceCallWithoutCommandAndWithResponse();
-                }
-
-                if (mapResponse == null)
-                {
-                    return Ok(new ResponseBase { IsSuccess = true });
-                }
-                if (entity == null)
-                {
-                    return StatusCode(400);
-                }
-
-                var response = mapResponse(entity);
-                response.IsSuccess = true;
-                return Ok(response);
+                var entityPreCall = HandleCommand(command, mapCommand);
+                var entityPostCall = await CallServiceMethod(entityPreCall, serviceCall);
+                return HandleResponse(entityPostCall, mapResponse);
             }
             catch (Exception ex) when (ex is ArgumentException || ex is DbUpdateException)
             {
@@ -140,6 +93,60 @@ namespace TodoList.Server.Controllers
             {
                 return StatusCode(500);
             }
+        }
+
+        private TEntity? HandleCommand<TCommand, TEntity>(TCommand? command, Func<TCommand, TEntity>? mapCommand) {
+            if (command != null && mapCommand != null)
+            {
+                return mapCommand(command);
+            }
+
+            return default;
+        }
+
+        private async Task<TEntity?> CallServiceMethod<TEntity>(TEntity? entity, ServiceCallVariant serviceCall) {
+            switch (serviceCall)
+            {
+                case NoCommandNoResponse(var call):
+                    await call();
+                    break;
+
+                case CommandNoResponse<TEntity>(var call):
+                    if (entity != null)
+                    {
+                        await call(entity);
+                    }
+                    break;
+
+                case NoCommandWithResponse<TEntity>(var call):
+                    return await call();
+
+                case CommandWithResponse<TEntity>(var call):
+                    if (entity != null)
+                    {
+                        return await call(entity);
+                    }
+                    break;
+            }
+
+            return default;
+        }
+
+        private ActionResult<TResponse> HandleResponse<TEntity, TResponse>(TEntity? entity, Func<TEntity, TResponse>? mapResponse)
+            where TResponse : ResponseBase
+        {
+            if (mapResponse == null)
+            {
+                return Ok(new ResponseBase { IsSuccess = true });
+            }
+            if (entity == null)
+            {
+                return StatusCode(400);
+            }
+
+            var response = mapResponse(entity);
+            response.IsSuccess = true;
+            return Ok(response);
         }
     }
 }
