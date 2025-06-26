@@ -1,5 +1,11 @@
 export interface Task {
     id: number;
-    label: string;
+    title: string;
     isCompleted: boolean;
-}
+};
+
+export const DefaultTask: Task = {
+    id: 0,
+    title: "",
+    isCompleted: false
+};

@@ -42,6 +42,7 @@ public static class ProgramExtensions
     {
         builder.Services.AddSingleton<IDbInitializerService, DbInitializerService>();
 
+        builder.Services.AddScoped<TodoGroupService>();
         builder.Services.AddScoped<TodoItemService>();
 
         return builder;

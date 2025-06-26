@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TodoList.Server.Services;
-using TodoList.Server.Queries;
-using Microsoft.EntityFrameworkCore;
 using TodoList.Server.Dtos;
+using TodoList.Server.Queries;
+using TodoList.Server.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace TodoList.Server.Controllers
 {

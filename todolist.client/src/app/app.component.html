@@ -1,21 +1,16 @@
-﻿<h1 id="tableLabel">Todo List</h1>
+﻿<h1>Todo List</h1>
 
 <table *ngIf="tasks" class="container">
     <tbody>
         <tr app-task
             *ngFor="let task of tasks"
-            id="{{ task.id }}"
+            id="task-{{ task.id }}"
             class="task"
-            [task]="task"
-            (update)="updateTask(task);"
-            (delete)="deleteTask(task.id);">
+            [taskData]="task">
         </tr>
         <tr app-task
-            id="new"
             class="task"
-            [task]="newTask"
-            [isNew]="true"
-            (create)="createTask(newTask);">
+            [isNew]="true">
         </tr>
     </tbody>
 </table>
