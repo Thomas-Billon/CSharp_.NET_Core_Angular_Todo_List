@@ -1,27 +1,38 @@
-﻿using TodoList.Server.Entities;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace TodoList.Server.Dtos
 {
-    public record TodoItemDTO(
-        int Id,
-        string Title,
-        bool IsCompleted
-    );
-
-    public static class TodoItemExtension
+    public class TodoItemDTO
     {
-        public static TodoItemDTO ToDTO(this TodoItem x) => new TodoItemDTO
-        (
-            x.Id,
-            x.Title,
-            x.IsCompleted
-        );
-
-        public static TodoItem ToEntity(this TodoItemDTO x) => new TodoItem
+        public class Create
         {
-            Id = x.Id,
-            Title = x.Title,
-            IsCompleted = x.IsCompleted
-        };
+            public class Command
+            {
+                [Required]
+                public required string Label { get; set; }
+            }
+
+            public class Response : ResponseBase
+            {
+                public required int Id { get; set; }
+                public required string Label { get; set; }
+                public required bool IsCompleted { get; set; }
+            }
+        }
+
+        public class Update
+        {
+            public class Command
+            {
+                public required string Label { get; set; }
+                public required bool IsCompleted { get; set; }
+            }
+
+            public class Response : ResponseBase
+            {
+                public required string Label { get; set; }
+                public required bool IsCompleted { get; set; }
+            }
+        }
     }
 }
