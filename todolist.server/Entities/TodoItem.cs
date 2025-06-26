@@ -6,7 +6,7 @@ namespace TodoList.Server.Entities
     {
         [Key]
         public int Id { get; set; }
-        public string Label { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
         public bool IsCompleted { get; set; } = false;
 
         public TodoGroup? TodoGroup { get; set; }

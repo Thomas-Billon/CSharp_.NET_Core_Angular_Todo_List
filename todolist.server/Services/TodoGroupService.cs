@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoList.Server.Data;
-using TodoList.Server.Dtos;
 using TodoList.Server.Entities;
+using TodoList.Server.Queries;
 
 namespace TodoList.Server.Services
 {
-    public class TodoGroupService : ITodoGroupService
+    public class TodoGroupService : ServiceBase
     {
         private readonly ApplicationDbContext _context;
 
@@ -14,110 +14,80 @@ namespace TodoList.Server.Services
             _context = context;
         }
 
-        #region GET
-
-        public async Task<IReadOnlyList<TodoGroupDTO>> GetAll()
+        public async Task<IReadOnlyList<TodoGroupQuery>> GetAll()
         {
             return await _context.TodoGroups.AsNoTracking() 
-                .Select_DTO()
+                .Select(TodoGroupQuery.Select)
                 .ToListAsync();
         }
 
-        public async Task<TodoGroupDTO?> GetById(int id)
+        public async Task<TodoGroupQuery?> GetById(int id)
         {
             return await _context.TodoGroups.AsNoTracking()
                 .Where(x => x.Id == id)
-                .Select_DTO()
+                .Select(TodoGroupQuery.Select)
                 .FirstOrDefaultAsync();
         }
 
-        #endregion GET
-
-        #region CREATE
-
-        public async Task<TodoGroupDTO?> Create(TodoGroupDTO dto)
+        public async Task<TodoGroup?> Create(TodoGroup entity)
         {
-            var entity = dto.ToEntity();
-
-            if (IsCreateValid(entity) == false)
-            {
-                return null;
-            }
+            Validate(entity, nameof(Create));
 
             _context.TodoGroups.Add(entity);
 
             await _context.SaveChangesAsync();
 
-            return entity.ToDTO();
+            EnsureCreated(entity);
+
+            return entity;
         }
 
-        public bool IsCreateValid(TodoGroup? entity)
+        public async Task<TodoGroup> Update(int id, TodoGroup entity)
         {
-            return true;
+            Validate(entity, nameof(Update));
+
+            var updateCount = await _context.TodoGroups
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.Title, entity.Title)
+                );
+
+            EnsureUpdated(updateCount);
+
+            return entity;
         }
 
-        #endregion CREATE
-
-        #region UPDATE
-
-        public async Task<bool> Update(TodoGroupDTO dto)
+        public async Task<string> UpdateTitle(int id, string title)
         {
-            var entity = await _context.TodoGroups.FirstOrDefaultAsync(x => x.Id == dto.Id);
-            if (entity == null || IsUpdateValid(entity) == false)
+            if (!IsTitleValid(title))
             {
-                return false;
+                throw new ArgumentException(nameof(title), "Parameter is invalid for update");
             }
 
-            entity.Id = dto.Id;
-            entity.Title = dto.Title;
+            var updateCount = await _context.TodoGroups
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.Title, title)
+                );
 
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
-        public bool IsUpdateValid(TodoGroup? entity)
-        {
-            return true;
-        }
-
-        #endregion UPDATE
-
-        #region DELETE
-
-        public async Task<bool> Delete(int id)
-        {
-            var entity = await _context.TodoGroups.FirstOrDefaultAsync(x => x.Id == id);
-            if (entity == null || IsDeleteValid(entity) == false)
+            if (updateCount != 1)
             {
-                return false;
+                throw new DbUpdateException("No entries were updated");
             }
 
-            _context.TodoGroups.Remove(entity);
-
-            await _context.SaveChangesAsync();
-
-            return true;
+            return title;
         }
 
-        public bool IsDeleteValid(TodoGroup? entity)
+        public async Task Delete(int id)
         {
-            return true;
+            var deleteCount = await _context.TodoGroups
+                .Where(x => x.Id == id)
+                .ExecuteDeleteAsync();
+
+            if (deleteCount != 1)
+            {
+                throw new DbUpdateException("No entries were deleted");
+            }
         }
-
-        #endregion DELETE
-    }
-
-    public static class TodoGroupQuery
-    {
-        #region SELECT
-
-        public static IQueryable<TodoGroupDTO> Select_DTO(this IQueryable<TodoGroup> source)
-        {
-            return source
-                .Select(x => x.ToDTO());
-        }
-
-        #endregion SELECT
     }
 }

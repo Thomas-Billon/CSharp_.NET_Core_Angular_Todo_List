@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TodoList.Server.Data;
 
-namespace TodoList.Server.Services
+namespace TodoList.Server.Data
 {
 	class DbInitializerService : IDbInitializerService
 	{

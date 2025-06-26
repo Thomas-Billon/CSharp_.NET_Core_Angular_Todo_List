@@ -16,10 +16,10 @@ namespace TodoList.Server.Controllers
         {
             try
             {
-                var model = mapCommand(command);
-                model = await serviceCall();
+                var entity = mapCommand(command);
+                entity = await serviceCall();
                 
-                var response = mapResponse(model);
+                var response = mapResponse(entity);
                 response.IsSuccess = true;
 
                 return Ok(response);

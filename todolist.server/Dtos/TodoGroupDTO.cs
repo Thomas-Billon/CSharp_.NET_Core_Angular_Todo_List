@@ -2,7 +2,7 @@
 
 namespace TodoList.Server.Dtos
 {
-    public class TodoItemDTO
+    public class TodoGroupDTO
     {
         public class Create
         {
@@ -16,7 +16,6 @@ namespace TodoList.Server.Dtos
             {
                 public required int Id { get; set; }
                 public required string Title { get; set; }
-                public required bool IsCompleted { get; set; }
             }
         }
 
@@ -25,13 +24,11 @@ namespace TodoList.Server.Dtos
             public class Command
             {
                 public required string Title { get; set; }
-                public required bool IsCompleted { get; set; }
             }
 
             public class Response : ResponseBase
             {
                 public required string Title { get; set; }
-                public required bool IsCompleted { get; set; }
             }
         }
     }

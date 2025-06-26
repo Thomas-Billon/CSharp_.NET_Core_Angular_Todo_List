@@ -7,28 +7,28 @@ using TodoList.Server.Services;
 namespace TodoList.Server.Controllers
 {
     [ApiController]
-	[Route("todo")]
-	public class TodoItemController : CustomControllerBase
+	[Route("todolist")]
+	public class TodoGroupController : CustomControllerBase
     {
-		private readonly TodoItemService _todoItemService;
+		private readonly TodoGroupService _todoGroupService;
 
-		public TodoItemController(TodoItemService todoItemService)
+		public TodoGroupController(TodoGroupService todoGroupService)
 		{
-			_todoItemService = todoItemService;
+			_todoGroupService = todoGroupService;
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<TodoItemQuery>>> GetAll()
+		public async Task<ActionResult<IEnumerable<TodoGroupQuery>>> GetAll()
 		{
-			var todoItems = await _todoItemService.GetAll();
+			var todoItems = await _todoGroupService.GetAll();
 
 			return Ok(todoItems);
 		}
 
 		[HttpGet("{id:int}")]
-		public async Task<ActionResult<TodoItemQuery>> GetById(int id)
+		public async Task<ActionResult<TodoGroupQuery>> GetById(int id)
 		{
-			var todoItem = await _todoItemService.GetById(id);
+			var todoItem = await _todoGroupService.GetById(id);
 
 			if (todoItem == null)
 			{
@@ -39,35 +39,35 @@ namespace TodoList.Server.Controllers
 		}
 
 		[HttpPost]
-		public Task<ActionResult<int>> Create(TodoItemDTO.Create.Command command)
+		public Task<ActionResult<int>> Create(TodoGroupDTO.Create.Command command)
         {
             return HandleRequest(
                 command,
                 _mapper.ToModel,
-                entity => _todoItemService.Create(entity),
+                entity => _todoGroupService.Create(entity),
                 _mapper.ToResponse
             );
         }
 
         [HttpPut("{id:int}")]
-        public Task<ActionResult<TodoItemDTO.Update>> Update(int id, TodoItemDTO.Update.Command command)
+        public Task<ActionResult<TodoGroupDTO.Update>> Update(int id, TodoGroupDTO.Update.Command command)
         {
             return HandleRequest(
                 command,
                 _mapper.ToModel,
-                entity => _todoItemService.Update(id, entity),
+                entity => _todoGroupService.Update(id, entity),
                 _mapper.ToResponse
             );
         }
 
         [HttpPut("{id:int}/title")]
-        public async Task<ActionResult<string>> UpdateTitle(int id, TodoItemDTO.UpdateTitle.Command command)
+        public async Task<ActionResult<string>> UpdateTitle(int id, TodoGroupDTO.UpdateTitle.Command command)
         {
             var model = _mapper.ToModel(command);
 
             try
             {
-                model = await _todoItemService.UpdateTitle(id, model);
+                model = await _todoGroupService.UpdateTitle(id, model);
             }
             catch (Exception ex) when (ex is ArgumentException || ex is DbUpdateException)
             {
@@ -83,31 +83,12 @@ namespace TodoList.Server.Controllers
             return Ok(response);
         }
 
-        [HttpPut("iscompleted/{id:int}")]
-        public async Task<ActionResult<bool>> UpdateIsCompleted(int id, bool isCompleted)
-        {
-            try
-            {
-                isCompleted = await _todoItemService.UpdateIsCompleted(id, isCompleted);
-            }
-            catch (Exception ex) when (ex is ArgumentException || ex is DbUpdateException)
-            {
-                return StatusCode(400);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
-
-            return Ok(isCompleted);
-        }
-
         [HttpDelete("{id:int}")]
 		public async Task<ActionResult> Delete(int id)
         {
             try
             {
-                await _todoItemService.Delete(id);
+                await _todoGroupService.Delete(id);
             }
             catch (Exception ex) when (ex is ArgumentException || ex is DbUpdateException)
             {

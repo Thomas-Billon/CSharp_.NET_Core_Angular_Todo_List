@@ -1,4 +1,5 @@
-﻿using TodoList.Server.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TodoList.Server.Data;
 using TodoList.Server.Entities;
 using TodoList.Server.Queries;
 
@@ -36,17 +37,17 @@ namespace TodoList.Server.Services
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<TodoItem> Create(TodoItem model)
+        public async Task<TodoItem?> Create(TodoItem entity)
         {
-            Validate(model, nameof(Create));
+            Validate(entity, nameof(Create));
 
-            _context.TodoItems.Add(model);
+            _context.TodoItems.Add(entity);
 
             await _context.SaveChangesAsync();
 
-            EnsureCreated(model);
+            EnsureCreated(entity);
 
-            return model;
+            return entity;
         }
 
         public async Task<TodoItem> Update(int id, TodoItem model)
@@ -56,7 +57,7 @@ namespace TodoList.Server.Services
             var updateCount = await _context.TodoItems
                 .Where(x => x.Id == id)
                 .ExecuteUpdateAsync(setters => setters
-                    .SetProperty(x => x.Label, model.Label)
+                    .SetProperty(x => x.Title, model.Title)
                     .SetProperty(x => x.IsCompleted, model.IsCompleted)
                 );
 
@@ -65,17 +66,17 @@ namespace TodoList.Server.Services
             return model;
         }
 
-        public async Task<string> UpdateLabel(int id, string label)
+        public async Task<string> UpdateTitle(int id, string title)
         {
-            if (!IsLabelValid(label))
+            if (!IsTitleValid(title))
             {
-                throw new ArgumentException(nameof(label), "Parameter is invalid for update");
+                throw new ArgumentException(nameof(title), "Parameter is invalid for update");
             }
 
             var updateCount = await _context.TodoItems
                 .Where(x => x.Id == id)
                 .ExecuteUpdateAsync(setters => setters
-                    .SetProperty(x => x.Label, label)
+                    .SetProperty(x => x.Title, title)
                 );
 
             if (updateCount != 1)
@@ -83,7 +84,7 @@ namespace TodoList.Server.Services
                 throw new DbUpdateException("No entries were updated");
             }
 
-            return label;
+            return title;
         }
 
         public async Task<bool> UpdateIsCompleted(int id, bool isCompleted)
@@ -122,9 +123,9 @@ namespace TodoList.Server.Services
             }
         }
 
-        private bool IsValid(TodoItem model) => IsLabelValid(model.Label);
+        private bool IsValid(TodoItem model) => IsTitleValid(model.Title);
 
-        private bool IsLabelValid(string label) => label != null;
+        private bool IsTitleValid(string title) => title != null;
 
         private void EnsureCreated(TodoItem model)
         {
