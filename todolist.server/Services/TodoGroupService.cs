@@ -5,7 +5,7 @@ using TodoList.Server.Queries;
 
 namespace TodoList.Server.Services
 {
-    public class TodoGroupService : ServiceBase
+    public class TodoGroupService : CustomServiceBase
     {
         private readonly ApplicationDbContext _context;
 

@@ -4,11 +4,10 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TodoList.Server.Data;
 
 #nullable disable
 
-namespace TodoList.Server.Migrations
+namespace TodoList.Server.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250208114607_AddTodoGroups")]

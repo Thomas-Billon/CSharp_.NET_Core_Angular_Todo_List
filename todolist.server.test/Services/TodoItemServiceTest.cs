@@ -5,7 +5,7 @@ using TodoList.Server.Data;
 using TodoList.Server.Entities;
 using TodoList.Server.Services;
 
-namespace todolist.server.test.Services
+namespace TodoList.Server.test.Services
 {
     [TestClass]
     public class TodoItemServiceTest

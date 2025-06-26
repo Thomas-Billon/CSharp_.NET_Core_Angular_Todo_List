@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace TodoList.Server.Migrations
+namespace TodoList.Server.Data.Migrations
 {
     /// <inheritdoc />
     public partial class AddTodoGroups : Migration

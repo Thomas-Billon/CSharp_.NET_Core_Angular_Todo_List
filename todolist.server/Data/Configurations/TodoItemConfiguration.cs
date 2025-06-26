@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TodoList.Server.Data;
 using TodoList.Server.Entities;
 
-namespace todolist.server.Data.Configurations
+namespace TodoList.Server.Data.Configurations
 {
     public class TodoItemConfiguration
     {

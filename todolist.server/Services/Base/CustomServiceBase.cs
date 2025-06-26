@@ -1,6 +1,6 @@
 ﻿namespace TodoList.Server.Services
 {
-    public abstract class ServiceBase
+    public abstract class CustomServiceBase
     {
     }
 }

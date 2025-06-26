@@ -1,4 +1,4 @@
-﻿namespace TodoList.Server.Data
+﻿namespace TodoList.Server.Data.Startup
 {
 	public interface IDbInitializerService
 	{

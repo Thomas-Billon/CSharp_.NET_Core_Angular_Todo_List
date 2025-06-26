@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TodoList.Server.Entities;
 
-namespace TodoList.Server.Data
+namespace TodoList.Server.Data.Configurations
 {
     public class TodoGroupConfiguration
     {
