@@ -2,7 +2,6 @@
 using TodoList.Server.Dtos;
 using TodoList.Server.Queries;
 using TodoList.Server.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace TodoList.Server.Controllers
 {
