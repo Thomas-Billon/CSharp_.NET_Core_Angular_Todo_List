@@ -24,18 +24,19 @@ namespace TodoList.Server.Controllers
         }
 
 		[HttpGet]
-		public async Task<ActionResult<IEnumerable<TodoItemQuery>>> GetAll()
-		{
-			var todoItems = await _todoItemService.GetAll();
-
-			return Ok(todoItems);
+		public Task<ActionResult<TodoItemDTO.GetAll.Response>> GetAll()
+        {
+            return HandleRequest(
+                async () => await _todoItemService.GetAll(),
+                _todoItemMapper.ToGetAllResponse
+            );
 		}
 
 		[HttpGet("{id:int}")]
 		public Task<ActionResult<TodoItemDTO.Get.Response>> GetById(int id)
 		{
             return HandleRequest(
-                () => _todoItemService.GetById(id),
+                async () => await _todoItemService.GetById(id),
                 _todoItemMapper.ToGetResponse
             );
 		}
@@ -46,7 +47,7 @@ namespace TodoList.Server.Controllers
             return HandleRequest(
                 command,
                 _todoItemMapper.ToEntity,
-                entity => _todoItemService.Create(entity) as Task<TodoItem?>,
+                async entity => await _todoItemService.Create(entity),
                 _todoItemMapper.ToCreateResponse
             );
         }
@@ -57,7 +58,7 @@ namespace TodoList.Server.Controllers
             return HandleRequest(
                 command,
                 _todoItemMapper.ToEntity,
-                entity => _todoItemService.Update(id, entity) as Task<TodoItem?>,
+                async entity => await _todoItemService.Update(id, entity),
                 _todoItemMapper.ToUpdateResponse
             );
         }
@@ -68,47 +69,28 @@ namespace TodoList.Server.Controllers
             return HandleRequest(
                 command,
                 _todoItemMapper.ToTitle,
-                title => _todoItemService.UpdateTitle(id, title) as Task<string?>,
+                async title => await _todoItemService.UpdateTitle(id, title),
                 _todoItemMapper.ToUpdateTitleResponse
             );
         }
 
-        [HttpPut("iscompleted/{id:int}")]
-        public async Task<ActionResult<bool>> UpdateIsCompleted(int id, bool isCompleted)
+        [HttpPut("{id:int}/iscompleted")]
+        public Task<ActionResult<TodoItemDTO.UpdateIsCompleted.Response>> UpdateIsCompleted(int id, TodoItemDTO.UpdateIsCompleted.Command command)
         {
-            try
-            {
-                isCompleted = await _todoItemService.UpdateIsCompleted(id, isCompleted);
-            }
-            catch (Exception ex) when (ex is ArgumentException || ex is DbUpdateException)
-            {
-                return StatusCode(400);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
-
-            return Ok(isCompleted);
+            return HandleRequest(
+                command,
+                _todoItemMapper.ToIsCompleted,
+                async isCompleted => await _todoItemService.UpdateIsCompleted(id, isCompleted),
+                _todoItemMapper.ToUpdateIsCompletedResponse
+            );
         }
 
         [HttpDelete("{id:int}")]
-		public async Task<ActionResult> Delete(int id)
+		public Task<ActionResult<ResponseBase>> Delete(int id)
         {
-            try
-            {
-                await _todoItemService.Delete(id);
-            }
-            catch (Exception ex) when (ex is ArgumentException || ex is DbUpdateException)
-            {
-                return StatusCode(400);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
-
-            return Ok();
+            return HandleRequest(
+                async () => await _todoItemService.Delete(id)
+            );
         }
 		
 	}
