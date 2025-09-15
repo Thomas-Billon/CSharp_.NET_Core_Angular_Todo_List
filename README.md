@@ -3,7 +3,7 @@
 ![Project: Web app](https://img.shields.io/badge/project-web%20app-blue.svg)
 [![License: Proprietary](https://img.shields.io/badge/license-proprietary-red.svg)](EULA.md)
  
-Todo list web app made with .NET Core 9.0 & Angular.
+Todo list web app made in .NET Core 9.0 & Angular.
 
 ## Requirements
 
